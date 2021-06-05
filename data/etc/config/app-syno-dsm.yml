@@ -1,0 +1,16 @@
+http:
+  routers:
+    dsm:
+      entryPoints:
+        - "https"
+      rule: "Host(`sub.my-domain.tld`)"
+      middlewares:
+        - chain-no-auth
+      tls: {}
+      service: dsm
+  services:
+    dsm:
+      loadBalancer:
+        servers:
+          - url: "http://<Your.syno.ip.address>:5000"
+        passHostHeader: true

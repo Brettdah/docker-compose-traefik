@@ -1,0 +1,72 @@
+version: '3'
+# NETWORKS
+networks:
+  proxy:
+    external: true
+
+secrets:
+  # secret name also used to name the file exposed within the container
+  ovh_endpoint:
+     # path on the host
+    file: "./secrets/ovh_endpoint.secret"
+  ovh_application_key:
+    file: "./secrets/ovh_application_key.secret"
+  ovh_application_secret:
+    file: "./secrets/ovh_application_secret.secret"
+  ovh_consumer_key:
+    file: "./secrets/ovh_consumer_key.secret"
+
+#SERVICES
+services:
+  Traefik:
+    image: traefik:v2.4.8
+    # debug
+    #entrypoint: ["sh", "-c", "sleep 2073600"]
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    # expose the predefined secret to the container by name
+    secrets:
+      - "ovh_endpoint"
+      - "ovh_application_key"
+      - "ovh_application_secret"
+      - "ovh_consumer_key"
+    environment:
+    # expose the path to file provided by docker containing the value we want for OVH_ENDPOINT.
+      - "OVH_ENDPOINT_FILE=/run/secrets/ovh_endpoint"
+      - "OVH_APPLICATION_KEY_FILE=/run/secrets/ovh_application_key"
+      - "OVH_APPLICATION_SECRET_FILE=/run/secrets/ovh_application_secret"
+      - "OVH_CONSUMER_KEY_FILE=/run/secrets/ovh_consumer_key"
+    # Publication des ports (8080 est le port d'administration)
+    ports:
+      - 80:80
+      - 443:443
+      #- 853:853
+      - 8080:8080
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.Traefik.entrypoints=http
+      - traefik.http.routers.Traefik.rule=Host(`sub.my-domain.tld`)
+      - traefik.http.middlewares.traefik-auth.basicauth.usersfile=/etc/traefik/htpwd
+      - traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https
+      - traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https
+      - traefik.http.routers.Traefik.middlewares=traefik-https-redirect
+      - traefik.http.routers.Traefik-secure.entrypoints=https
+      - traefik.http.routers.Traefik-secure.rule=Host(`sub.my-domain.tld`)
+      - traefik.http.routers.Traefik-secure.middlewares=chain-basic-auth@file
+        #- traefik.http.routers.Traefik-secure.middlewares=traefik-auth
+      - traefik.http.routers.Traefik-secure.tls=true
+      - traefik.http.routers.Traefik-secure.tls.certresolver=le
+      - traefik.http.routers.Traefik-secure.tls.domains[0].main=sub.my-domain.tld
+      - traefik.http.routers.Traefik-secure.tls.domains[0].sans=*.sub.my-domain.tld
+      - traefik.http.routers.Traefik-secure.service=api@internal
+    volumes:
+      # Liaison avec docker 
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Fichiers de configuration
+      - ./data/etc/:/etc/traefik:ro
+      # Fichiers temporaires
+      - ./data/tmp/:/tmp
+      # Stockage des fichiers Let's encrypt
+      - ./data/letsencrypt/:/letsencrypt

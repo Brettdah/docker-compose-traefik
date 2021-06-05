@@ -1,0 +1,21 @@
+http:
+  routers:
+    pihole:
+      entryPoints:
+        - "https"
+      rule: "Host(`sub.my-domain.tld`)"
+      middlewares:
+        - chain-no-auth-local-only
+        - addprefix-pihole
+      tls: {}
+      service: pihole
+  services:
+    pihole:
+      loadBalancer:
+        servers:
+          - url: "http://<your.pihole.ip.adress>:80"
+        passHostHeader: true
+  middlewares:
+    addprefix-pihole:
+      addPrefix:
+        prefix: "/admin"

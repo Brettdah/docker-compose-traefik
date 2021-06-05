@@ -1,0 +1,36 @@
+http:
+  middlewares:
+    chain-no-auth:
+      chain:
+        middlewares:
+          #- middlewares-rate-limit
+          - middlewares-secure-headers
+
+    chain-basic-auth:
+      chain:
+        middlewares:
+          #- middlewares-rate-limit
+          - middlewares-secure-headers
+          - middlewares-basic-auth
+
+    chain-no-auth-local-only:
+      chain:
+        middlewares:
+          #- middlewares-rate-limit
+          - middlewares-secure-headers
+          - middlewares-default-whitelist
+
+# Don't have that yet !
+#    chain-oauth:
+#      chain:
+#        middlewares:
+#          - middlewares-rate-limit
+#          - middlewares-secure-headers
+#          - middlewares-oauth
+#
+#    chain-authelia:
+#      chain:
+#        middlewares:
+#          - middlewares-rate-limit
+#          - middlewares-secure-headers
+#          - middlewares-authelia
