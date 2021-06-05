@@ -2,15 +2,16 @@
 
 Here is the base of my configuration for traefik proxy on my Synology Network Area Storage (NAS). I removed my personal information from the files so everyone can take a look.
 
-As I just told you, I'm using a synology NAS and I wanted to expose the DSM User interface. So you will find the configuration to do so under data/etc/config/app-syno-dsm.yml
+As I just told you, I'm using a synology NAS and I wanted to expose the DSM User interface. So you will find the configuration to do so under *data/etc/config/app-syno-dsm.yml*
 
-I'm also using pihole and I exposed the admin interface over my network with my ssl certificate. Using a middleware with local IP whitelisting. You will find the configuration to do so under data/etc/config/app-pihole.yml
+I'm also using pihole and I exposed the admin interface over my network with my ssl certificate. Using a middleware with local IP whitelisting. You will find the configuration to do so under *data/etc/config/app-pihole.yml*
 
 ## What can be changed
 
 You may want to change the network name,  I called it *proxy* but you it's just a name. I could have used *tatooine* too but **I hate sand !**
 
-The URL to access your proxy should be changed too ! except if you own the domain *my-domain.tld*... and have a subdomain named *sub* but that's likely not the case so change it to your own domain.
+The URL to access your proxy should be changed too ! except if you own the domain *my-domain.tld*... and have a subdomain named *sub* but that's likely not the case so change it to your own domain.  
+So every where you see *sub.mydomain.tld* you will need to replace with your domain or subdomain
 
 You will need to create and htpassword file named **htpwd** or change the name of it in the docker-compose file. That is if you want to expose traefik dashboard to the internet witout other autentication method !
 
@@ -29,6 +30,8 @@ So if you are using OVH as your registrar you will want to create a few files un
 - ovh_application_key.secret
 - ovh_application_secret.secret
 - ovh_consumer_key.secret
+
+You may want to change the email address in *data/etc/traefik.yml* And to first use the commanted *caServer* line to see if you are all set to get your certificate.
 
 ## sources
 
